@@ -1,5 +1,5 @@
 # Определение стандартов для Artifex-AI
-## [Анализ и сравнение с продуктом Artifex-AI](https://github.com/Hyper-glitch/artifex-ai/blob/main/analysis-comparison.md)
+## [Анализ и сравнение конкурентов с продуктом Artifex-AI](https://github.com/Hyper-glitch/artifex-ai/blob/main/analysis-comparison.md)
 
 
 ## ✅ Минимальные требования к функциональности
