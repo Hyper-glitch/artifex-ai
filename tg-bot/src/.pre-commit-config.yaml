@@ -1,0 +1,44 @@
+fail_fast: true
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.3.0
+    hooks:
+      - id: check-ast
+      - id: check-yaml
+      - id: check-toml
+      - id: check-json
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        args: ['--maxkb=1000']
+        exclude: "research/"
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: detect-private-key
+  - repo: local
+    hooks:
+      - id: black
+        name: Black
+        entry: poetry run black .
+        pass_filenames: false
+        language: system
+  - repo: local
+    hooks:
+      - id: isort
+        name: isort
+        entry: poetry run isort .
+        pass_filenames: false
+        language: system
+  - repo: local
+    hooks:
+      - id: mypy
+        name: Mypy
+        entry: poetry run mypy src --install-types --non-interactive --explicit-package-bases
+        pass_filenames: false
+        language: system
+  - repo: local
+    hooks:
+      - id: flake8
+        name: Flake8
+        entry: poetry run flake8p .
+        pass_filenames: false
+        language: system
