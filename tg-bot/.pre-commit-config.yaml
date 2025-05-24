@@ -8,37 +8,38 @@ repos:
       - id: check-toml
       - id: check-json
       - id: check-merge-conflict
-      - id: check-added-large-files
-        args: ['--maxkb=1000']
-        exclude: "research/"
       - id: trailing-whitespace
       - id: end-of-file-fixer
       - id: detect-private-key
+
   - repo: local
     hooks:
       - id: black
-        name: Black
+        name: black
         entry: poetry run black .
         pass_filenames: false
         language: system
-  - repo: local
-    hooks:
+
       - id: isort
         name: isort
         entry: poetry run isort .
         pass_filenames: false
         language: system
-  - repo: local
-    hooks:
-      - id: mypy
-        name: Mypy
-        entry: poetry run mypy src --install-types --non-interactive --explicit-package-bases
+
+      - id: flake8
+        name: flake8
+        entry: poetry run flake8p .
         pass_filenames: false
         language: system
-  - repo: local
-    hooks:
-      - id: flake8
-        name: Flake8
-        entry: poetry run flake8p .
+
+      - id: mypy
+        name: mypy
+        entry: poetry run mypy . --install-types --non-interactive
+        pass_filenames: false
+        language: system
+
+      - id: pytest
+        name: pytest
+        entry: poetry run pytest --cov=src --cov-report=term-missing --cov-fail-under=80
         pass_filenames: false
         language: system
