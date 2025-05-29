@@ -1,11 +1,15 @@
-from buttons import create_rating_buttons, create_action_buttons
+from buttons import create_action_buttons, create_rating_buttons
 from client import AsyncApiClient
+from decorator import requires_auth
 from dialogs import (
     ACCEPTED_MESSAGE,
     ASK_NEW_PROMPT_MESSAGE,
+    ERROR_MESSAGE,
     PROCESSING_MESSAGE,
+    RATE_PROMPT_MESSAGE,
+    RATE_THANKS_MESSAGE,
     REGENERATING_MESSAGE,
-    START_MESSAGE, ERROR_MESSAGE, RATE_PROMPT_MESSAGE, RATE_THANKS_MESSAGE,
+    START_MESSAGE,
 )
 from enums import CallbackData
 from loguru import logger
@@ -22,9 +26,11 @@ class Handlers:
         self.bot.message_handler(content_types=["text"])(self.task_handler)
         self.bot.callback_query_handler(func=lambda call: True)(self.callback_handler)
 
+    @requires_auth
     async def start_handler(self, message: Message) -> None:
         await self.bot.send_message(message.chat.id, START_MESSAGE)
 
+    @requires_auth
     async def task_handler(self, message: Message) -> None:
         logger.info("Starting to process user prompt...")
         await self.bot.send_message(message.chat.id, PROCESSING_MESSAGE)
@@ -36,10 +42,13 @@ class Handlers:
 
         await self.bot.send_message(message.chat.id, "DONE", reply_markup=create_action_buttons())
 
+    @requires_auth
     async def callback_handler(self, call: CallbackQuery) -> None:
         if call.data == CallbackData.ACCEPT:
             await self.bot.answer_callback_query(call.id, ACCEPTED_MESSAGE)
-            await self.bot.send_message(call.message.chat.id, RATE_PROMPT_MESSAGE, reply_markup=create_rating_buttons())
+            await self.bot.send_message(
+                call.message.chat.id, RATE_PROMPT_MESSAGE, reply_markup=create_rating_buttons()
+            )
 
         elif call.data == CallbackData.REGENERATE:
             await self.bot.answer_callback_query(call.id, REGENERATING_MESSAGE)

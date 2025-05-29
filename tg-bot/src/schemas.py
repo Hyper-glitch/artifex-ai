@@ -4,9 +4,21 @@ from typing import Literal, Optional
 from pydantic import BaseModel, Field
 
 
-class UserInfo(BaseModel):
+class BaseUserInfo(BaseModel):
     id: int = Field(..., description="Уникальный Telegram user_id")
     username: Optional[str] = Field(None, description="Telegram username")
+
+
+class AuthUserRequest(BaseUserInfo):
+    pass
+
+
+class AuthUserResponse(BaseModel):
+    success: bool
+    message: str
+
+
+class UserInfo(BaseModel):
     first_name: str = Field(..., description="Имя пользователя")
     last_name: Optional[str] = Field(None, description="Фамилия пользователя")
     language_code: Optional[str] = Field(None, description="Код языка, например 'ru', 'en'")

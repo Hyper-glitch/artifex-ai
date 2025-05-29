@@ -1,7 +1,6 @@
 from functools import lru_cache
 
 from enums import CallbackData
-
 from telebot.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 
