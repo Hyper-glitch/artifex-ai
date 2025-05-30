@@ -1,14 +1,28 @@
 import uuid
-from telebot.types import Message
 
 import aiohttp
 from aiohttp import ClientSession
-from schemas import CreateTaskRequest, UserInfo, FeedbackTaskRequest
+from schemas import (
+    AuthUserRequest,
+    AuthUserResponse,
+    CreateTaskRequest,
+    FeedbackTaskRequest,
+    UserInfo,
+)
+from telebot.types import Message
 
 
 class AsyncApiClient:
     def __init__(self, base_url: str, token: str) -> None:
         self._session = self._create_session(token, base_url)
+
+    async def auth_user(self, message: Message) -> AuthUserResponse:
+        dto = AuthUserRequest.model_validate(message.from_user.to_dict())
+        async with self._session.post("/api/v1/users/authorize/", json=dto.model_dump()) as resp:
+            resp.raise_for_status()
+            raw_data = await resp.json()
+
+        return AuthUserResponse.model_validate(**raw_data)
 
     async def create_task(self, message: Message) -> None:
         dto = CreateTaskRequest(
@@ -31,7 +45,7 @@ class AsyncApiClient:
     @staticmethod
     def _create_session(token: str, base_url: str) -> ClientSession:
         headers = {
-            "Authorization": f"Bearer {token}",
+            "Authorization": token,
             "Content-Type": "application/json",
         }
         return aiohttp.ClientSession(headers=headers, base_url=base_url)
