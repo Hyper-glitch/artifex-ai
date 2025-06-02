@@ -1,7 +1,7 @@
 from functools import wraps
-from telebot.types import Message
 
 from dialogs import NOT_AUTH_MESSAGE
+from telebot.types import Message
 
 
 def requires_auth(handler):
@@ -11,4 +11,5 @@ def requires_auth(handler):
             await self.bot.send_message(message.chat.id, NOT_AUTH_MESSAGE)
             return
         return await handler(self, message, *args, **kwargs)
+
     return wrapper

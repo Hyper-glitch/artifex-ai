@@ -1,12 +1,12 @@
 from datetime import datetime
-from typing import Literal, Optional
+from typing import Literal
 
 from pydantic import BaseModel, Field
 
 
 class BaseUserInfo(BaseModel):
     id: int = Field(..., description="Уникальный Telegram user_id")
-    username: Optional[str] = Field(None, description="Telegram username")
+    username: str | None = Field(None, description="Telegram username")
 
 
 class AuthUserRequest(BaseUserInfo):
@@ -18,10 +18,10 @@ class AuthUserResponse(BaseModel):
     message: str
 
 
-class UserInfo(BaseModel):
+class UserInfo(BaseUserInfo):
     first_name: str = Field(..., description="Имя пользователя")
-    last_name: Optional[str] = Field(None, description="Фамилия пользователя")
-    language_code: Optional[str] = Field(None, description="Код языка, например 'ru', 'en'")
+    last_name: str | None = Field(None, description="Фамилия пользователя")
+    language_code: str | None = Field(None, description="Код языка, например 'ru', 'en'")
 
 
 class FeedbackTaskRequest(BaseModel):
@@ -34,7 +34,7 @@ class FeedbackTaskRequest(BaseModel):
 
 
 class CreateTaskRequest(BaseModel):
-    user_info: UserInfo
+    user_info: BaseUserInfo
     task_id: str = Field(..., description="Уникальный идентификатор задачи")
     prompt: str = Field(..., description="Исходный текст запроса для генерации изображения")
     status: Literal["new", "queued", "processing", "completed", "failed"] = Field(
