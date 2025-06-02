@@ -16,4 +16,4 @@ class User(Base):
     language_code = Column(String, nullable=True, unique=True)
     role: UserRole = Column(SQLAlchemyEnum(UserRole), default=UserRole.USER)
 
-    tasks = relationship("MLTask", back_populates="user")
+    tasks = relationship("AITask", back_populates="user")
