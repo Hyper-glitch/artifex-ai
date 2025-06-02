@@ -3,9 +3,9 @@ from fastapi import APIRouter, Depends, Security, status
 from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from api.dependepcies import get_auth_service, get_session, verify_auth_token
-from api.dto.user import AuthUserRequest
-from api.services.auth import AuthService
+from api.dependepcies import get_session, get_user_service, verify_auth_token
+from api.dto.user import AuthUserRequest, SignUpUserRequest
+from api.services.auth import SignUpStatus, UserService
 
 router = APIRouter(prefix="/users")
 
@@ -14,17 +14,39 @@ router = APIRouter(prefix="/users")
 async def authorize(
     request: AuthUserRequest,
     session: AsyncSession = Depends(get_session),
-    auth_service: AuthService = Depends(get_auth_service),
+    service: UserService = Depends(get_user_service),
     _: None = Security(verify_auth_token),
 ) -> JSONResponse:
     try:
-        await auth_service.auth_user(user_data=request, session=session)
+        await service.auth(user_data=request, session=session)
     except UserNotFoundException as exc:
         status_code = status.HTTP_400_BAD_REQUEST
         content = {"success": False, "message": str(exc)}
     else:
         content = {"success": True}
         status_code = status.HTTP_200_OK
+
+    return JSONResponse(
+        content=content,
+        status_code=status_code,
+    )
+
+
+@router.post("/sign-up/")
+async def sign_up(
+    request: SignUpUserRequest,
+    session: AsyncSession = Depends(get_session),
+    service: UserService = Depends(get_user_service),
+    _: None = Security(verify_auth_token),
+) -> JSONResponse:
+    try:
+        result = await service.sign_up(user_data=request, session=session)
+    except Exception as exc:
+        content = {"success": False, "message": str(exc)}
+        status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+    else:
+        content = {"success": True}
+        status_code = result.http_status
 
     return JSONResponse(
         content=content,
