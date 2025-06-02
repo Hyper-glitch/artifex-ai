@@ -1,11 +1,8 @@
-from enums import UserRole
 from pydantic import BaseModel, Field
 
 
 class UserBase(BaseModel):
     id: int
-    username: str
-    role: UserRole = UserRole.USER
 
 
 class AuthUserRequest(BaseModel):

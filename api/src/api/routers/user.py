@@ -1,11 +1,12 @@
-from exceptions import UserNotFoundException
+
 from fastapi import APIRouter, Depends, Security, status
 from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.dependepcies import get_session, get_user_service, verify_auth_token
 from api.dto.user import AuthUserRequest, SignUpUserRequest
-from api.services.auth import UserService
+from api.exceptions import UserNotFoundException
+from api.services.user import UserService
 
 router = APIRouter(prefix="/users")
 

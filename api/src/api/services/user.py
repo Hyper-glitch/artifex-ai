@@ -1,8 +1,8 @@
 import logging
 from typing import Callable
 
+from api.exceptions import UserNotFoundException
 from enums import SignUpStatus
-from exceptions import UserNotFoundException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.dto.user import AuthUserRequest, SignUpUserRequest

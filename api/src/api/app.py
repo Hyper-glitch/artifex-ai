@@ -5,14 +5,17 @@ from api_analytics.fastapi import Analytics
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from api.repositories.task import TaskRepository
+from api.services.task import TaskService
 from database import init_db
-from logger import logger, set_up_logger
-from routers.user import router as auth_router
+from logger import logger
+from routers.user import router as user_router
+from routers.task import router as task_router
 from settings import settings
 from starlette.types import Lifespan
 
 from api.repositories.user import UserRepository
-from api.services.auth import UserService
+from api.services.user import UserService
 
 
 def create_app(lifespan: Lifespan) -> FastAPI:
@@ -25,7 +28,8 @@ def create_app(lifespan: Lifespan) -> FastAPI:
         debug=settings.DEBUG,
         lifespan=lifespan,
     )
-    app.include_router(prefix="/api/v1", router=auth_router)
+    app.include_router(prefix="/api/v1", router=user_router)
+    app.include_router(prefix="/api/v1", router=task_router)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=["*"],
@@ -41,9 +45,11 @@ def create_app(lifespan: Lifespan) -> FastAPI:
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator:
     logger.info("App startup...")
-    set_up_logger()
+    # set_up_logger()
     await init_db()
+
     app.state.user_service = UserService(repo_factory=lambda session: UserRepository(session))
+    app.state.task_service = TaskService(repo_factory=lambda session: TaskRepository(session))
     yield
     logger.info("App shutdown.")
 

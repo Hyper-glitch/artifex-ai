@@ -4,11 +4,15 @@ from settings import settings
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
-from api.services.auth import UserService
+from api.services.user import UserService
 
 
 async def get_user_service(request: Request) -> UserService:
     return request.app.state.user_service
+
+
+async def get_task_service(request: Request) -> UserService:
+    return request.app.state.task_service
 
 
 async def get_session() -> AsyncSession:

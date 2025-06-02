@@ -1,7 +1,20 @@
 from datetime import datetime
 
+from pydantic.v1 import Field
+from typing import Literal
+
 from enums import TaskStatus
 from pydantic import BaseModel, ConfigDict
+
+
+class AITaskRequest(BaseModel):
+    user_id: int
+    task_id: str = Field(..., description="Уникальный идентификатор задачи")
+    prompt: str = Field(..., description="Исходный текст запроса для генерации изображения")
+    status: Literal["new", "queued", "processing", "completed", "failed"] = Field(
+        ..., description="Статус задачи"
+    )
+    created_at: datetime = Field(..., description="Дата создания задачи")
 
 
 class MLTaskResponse(BaseModel):
