@@ -24,10 +24,10 @@ class AsyncApiClient:
 
         return AuthUserResponse.model_validate(**raw_data)
 
-    async def sign_up_user(self, message: Message) -> None:
+    async def sign_up_user(self, message: Message) -> int:
         dto = UserInfo.model_validate(message.json["chat"])
         async with self._session.post("/api/v1/users/sign-up/", json=dto.model_dump()) as resp:
-            resp.raise_for_status()
+            return resp.status
 
     async def create_task(self, message: Message) -> None:
         dto = CreateTaskRequest(

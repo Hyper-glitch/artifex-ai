@@ -9,7 +9,7 @@ from dialogs import (
     RATE_PROMPT_MESSAGE,
     RATE_THANKS_MESSAGE,
     REGENERATING_MESSAGE,
-    SUCCESS_SIGN_UP,
+    STATUS_MESSAGES,
     WELCOME_MESSAGE,
 )
 from enums import CallbackData
@@ -40,12 +40,14 @@ class Handlers:
 
     async def callback_registrate(self, call: CallbackQuery) -> None:
         try:
-            await self._client.sign_up_user(call.message)
+            status = await self._client.sign_up_user(call.message)
         except Exception as exc:
             logger.error(f"Problem when sign up user in API. {exc}")
             await self.bot.send_message(call.message.chat.id, ERROR_MESSAGE)
-        else:
-            await self.bot.send_message(call.message.chat.id, SUCCESS_SIGN_UP)
+            return
+
+        message = STATUS_MESSAGES.get(status, ERROR_MESSAGE)
+        await self.bot.send_message(call.message.chat.id, message)
 
     @requires_auth
     async def task_handler(self, message: Message) -> None:
