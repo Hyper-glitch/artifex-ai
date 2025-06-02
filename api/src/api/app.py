@@ -10,7 +10,7 @@ from settings import settings
 from starlette.types import Lifespan
 
 from api.repositories.user import UserRepository
-from api.services.auth import AuthService
+from api.services.auth import UserService
 
 
 def create_app(lifespan: Lifespan) -> FastAPI:
@@ -42,7 +42,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator:
     set_up_logger()
     # await init_db()
     # await create_users()
-    app.state.auth_service = AuthService(repo_factory=lambda session: UserRepository(session))
+    app.state.user_service = UserService(repo_factory=lambda session: UserRepository(session))
     yield
     logger.info("App shutdown.")
 
