@@ -9,12 +9,13 @@ from dialogs import (
     RATE_PROMPT_MESSAGE,
     RATE_THANKS_MESSAGE,
     REGENERATING_MESSAGE,
-    START_MESSAGE,
+    SUCCESS_SIGN_UP,
+    WELCOME_MESSAGE,
 )
 from enums import CallbackData
 from loguru import logger
 from telebot.async_telebot import AsyncTeleBot
-from telebot.types import CallbackQuery, Message
+from telebot.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup, Message
 
 
 class Handlers:
@@ -24,11 +25,27 @@ class Handlers:
 
         self.bot.message_handler(commands=["start"])(self.start_handler)
         self.bot.message_handler(content_types=["text"])(self.task_handler)
-        self.bot.callback_query_handler(func=lambda call: True)(self.callback_handler)
+        self.bot.callback_query_handler(func=lambda call: call.data != "registrate")(
+            self.callback_handler
+        )
+        self.bot.callback_query_handler(func=lambda call: call.data == "registrate")(
+            self.callback_registrate
+        )
 
-    @requires_auth
     async def start_handler(self, message: Message) -> None:
-        await self.bot.send_message(message.chat.id, START_MESSAGE)
+        keyboard = InlineKeyboardMarkup()
+        btn = InlineKeyboardButton(text="Регистрация", callback_data="registrate")
+        keyboard.add(btn)
+        await self.bot.send_message(message.chat.id, WELCOME_MESSAGE, reply_markup=keyboard)
+
+    async def callback_registrate(self, call: CallbackQuery) -> None:
+        try:
+            await self._client.sign_up_user(call.message)
+        except Exception as exc:
+            logger.error(f"Problem when sign up user in API. {exc}")
+            await self.bot.send_message(call.message.chat.id, ERROR_MESSAGE)
+        else:
+            await self.bot.send_message(call.message.chat.id, SUCCESS_SIGN_UP)
 
     @requires_auth
     async def task_handler(self, message: Message) -> None:
