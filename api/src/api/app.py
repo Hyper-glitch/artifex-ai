@@ -4,8 +4,10 @@ from typing import AsyncGenerator
 from api_analytics.fastapi import Analytics
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
+from database import init_db
 from logger import logger, set_up_logger
-from routers.auth import router as auth_router
+from routers.user import router as auth_router
 from settings import settings
 from starlette.types import Lifespan
 
@@ -40,8 +42,7 @@ def create_app(lifespan: Lifespan) -> FastAPI:
 async def lifespan(app: FastAPI) -> AsyncGenerator:
     logger.info("App startup...")
     set_up_logger()
-    # await init_db()
-    # await create_users()
+    await init_db()
     app.state.user_service = UserService(repo_factory=lambda session: UserRepository(session))
     yield
     logger.info("App shutdown.")
