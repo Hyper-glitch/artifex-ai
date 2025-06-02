@@ -34,7 +34,7 @@ class FeedbackTaskRequest(BaseModel):
 
 
 class CreateTaskRequest(BaseModel):
-    user_info: BaseUserInfo
+    user_id: int
     task_id: str = Field(..., description="Уникальный идентификатор задачи")
     prompt: str = Field(..., description="Исходный текст запроса для генерации изображения")
     status: Literal["new", "queued", "processing", "completed", "failed"] = Field(

@@ -1,4 +1,4 @@
-from buttons import create_action_buttons, create_rating_buttons
+from buttons import create_rating_buttons
 from client import AsyncApiClient
 from decorator import requires_auth
 from dialogs import (
@@ -19,12 +19,15 @@ from telebot.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMar
 
 
 class Handlers:
+    _user_states: dict[int, str] = {}
+
     def __init__(self, bot: AsyncTeleBot, client: AsyncApiClient) -> None:
         self.bot = bot
         self._client = client
 
         self.bot.message_handler(commands=["start"])(self.start_handler)
-        self.bot.message_handler(content_types=["text"])(self.task_handler)
+        self.bot.message_handler(commands=["generate"])(self.handle_generate_command)
+        self.bot.message_handler(content_types=["text"])(self.handle_prompt)
         self.bot.callback_query_handler(func=lambda call: call.data != "registrate")(
             self.callback_handler
         )
@@ -50,16 +53,26 @@ class Handlers:
         await self.bot.send_message(call.message.chat.id, message)
 
     @requires_auth
-    async def task_handler(self, message: Message) -> None:
-        logger.info("Starting to process user prompt...")
-        await self.bot.send_message(message.chat.id, PROCESSING_MESSAGE)
-        try:
-            await self._client.create_task(message)
-        except Exception as exc:
-            logger.error(f"Problem when creating task in API. {exc}")
-            await self.bot.send_message(message.chat.id, ERROR_MESSAGE)
+    async def handle_generate_command(self, message: Message):
+        await self.bot.send_message(
+            message.chat.id,
+            "Please describe the image you want to generate (in English):"
+        )
+        self._user_states[message.chat.id] = "awaiting_prompt"
 
-        await self.bot.send_message(message.chat.id, "DONE", reply_markup=create_action_buttons())
+    @requires_auth
+    async def handle_prompt(self, message: Message):
+        state = self._user_states.get(message.chat.id)
+
+        if state == "awaiting_prompt":
+            try:
+                await self._client.create_task(message)
+            except Exception as exc:
+                logger.exception(f"Task creation failed. Error: {exc}")
+                await self.bot.send_message(message.chat.id, "❌ Error creating task.")
+            else:
+                self._user_states.pop(message.chat.id, None)
+                await self.bot.send_message(message.chat.id, PROCESSING_MESSAGE)
 
     @requires_auth
     async def callback_handler(self, call: CallbackQuery) -> None:

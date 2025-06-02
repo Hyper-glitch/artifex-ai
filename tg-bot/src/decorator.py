@@ -7,9 +7,12 @@ from telebot.types import Message
 def requires_auth(handler):
     @wraps(handler)
     async def wrapper(self, message: Message, *args, **kwargs):
-        if not await self._client.auth_user(message):
+        try:
+            await self._client.auth_user(message)
+        except Exception:
             await self.bot.send_message(message.chat.id, NOT_AUTH_MESSAGE)
             return
+
         return await handler(self, message, *args, **kwargs)
 
     return wrapper
