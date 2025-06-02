@@ -1,31 +1,30 @@
 import logging
 from typing import Callable
 
-from exceptions import UserAlreadyExistsException, UserNotFoundException
-from models.user import User
+from enums import SignUpStatus
+from exceptions import UserNotFoundException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from api.dto.user import AuthUserRequest, RegisterUserRequest
+from api.dto.user import AuthUserRequest, SignUpUserRequest
 from api.repositories.user import UserRepository
 
 
-class AuthService:
+class UserService:
     def __init__(self, repo_factory: Callable[[AsyncSession], UserRepository]) -> None:
         self._repo_factory = repo_factory
 
-    async def register_user(self, user_data: RegisterUserRequest, session: AsyncSession) -> User:
+    async def sign_up(self, user_data: SignUpUserRequest, session: AsyncSession) -> SignUpStatus:
         """Регистрирует нового пользователя."""
         repo = self._repo_factory(session)
         existing_user = await repo.get_user(user_data.id, user_data.username)
-        if existing_user and user_data.username == existing_user.username:
-            raise UserAlreadyExistsException()
+        if existing_user:
+            return SignUpStatus.ALREADY_EXISTS
 
-        user = await repo.create_user(user_data)
-        logging.info(f"User - {user.id} - successfully registered.")
+        await repo.create_user(user_data)
+        logging.info(f"User - {user_data.id} - successfully registered.")
+        return SignUpStatus.CREATED
 
-        return user
-
-    async def auth_user(self, user_data: AuthUserRequest, session: AsyncSession) -> None:
+    async def auth(self, user_data: AuthUserRequest, session: AsyncSession) -> None:
         """Проверяет пользователя в базе данных."""
         repo = self._repo_factory(session)
         user = await repo.get_user(id=user_data.id, username=user_data.username)
