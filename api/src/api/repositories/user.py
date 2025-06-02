@@ -1,6 +1,7 @@
 import logging
 from typing import Optional, Sequence
 
+from api.dto.user import SignUpUserRequest
 from models import User
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -13,12 +14,14 @@ class UserRepository:
     def __init__(self, session: AsyncSession) -> None:
         self._session = session
 
-    async def create_user(self, user_data: RegisterUserRequest) -> User:
+    async def create_user(self, user_data: SignUpUserRequest) -> User:
         """Создаёт нового пользователя."""
         user = User(
+            id=user_data.id,
             username=user_data.username,
-            email=user_data.email,
-            role=user_data.role,
+            first_name=user_data.first_name,
+            last_name=user_data.last_name,
+            language_code=user_data.language_code,
         )
         self._session.add(user)
         await self._session.commit()
