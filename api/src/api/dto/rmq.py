@@ -4,6 +4,6 @@ from pydantic import BaseModel
 
 
 class RMQMessage(BaseModel):
-    task_id: UUID
-    user_id: int
+    task_id: str
     prompt: str
+    chat_id: int
