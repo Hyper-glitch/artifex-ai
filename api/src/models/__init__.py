@@ -1,7 +1,7 @@
-from models.task import MLTask
+from models.task import AITask
 from models.user import User
 
 __all__ = [
-    "MLTask",
+    "AITask",
     "User",
 ]
