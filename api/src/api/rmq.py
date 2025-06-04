@@ -8,7 +8,7 @@ from settings import settings
 from api.dto.rmq import RMQMessage
 
 
-class AsyncRabbitMQClient:
+class AsyncRabbitMQProducer:
     """Асинхронный клиент для RabbitMQ."""
 
     _channel: AbstractChannel | None = None
