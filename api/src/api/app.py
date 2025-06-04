@@ -6,6 +6,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from api.repositories.task import TaskRepository
+from api.rmq import AsyncRabbitMQProducer
 from api.services.task import TaskService
 from database import init_db
 from logger import logger
@@ -48,8 +49,9 @@ async def lifespan(app: FastAPI) -> AsyncGenerator:
     # set_up_logger()
     await init_db()
 
+    producer = AsyncRabbitMQProducer()
     app.state.user_service = UserService(repo_factory=lambda session: UserRepository(session))
-    app.state.task_service = TaskService(repo_factory=lambda session: TaskRepository(session))
+    app.state.task_service = TaskService(repo_factory=lambda session: TaskRepository(session), producer=producer)
     yield
     logger.info("App shutdown.")
 
