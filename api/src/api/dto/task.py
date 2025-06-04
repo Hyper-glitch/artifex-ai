@@ -14,6 +14,7 @@ class AITaskRequest(BaseModel):
     status: Literal["new", "queued", "processing", "completed", "failed"] = Field(
         ..., description="Статус задачи"
     )
+    chat_id: int
     created_at: datetime = Field(..., description="Дата создания задачи")
 
 

@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 
 from api.dto.task import AITaskRequest
@@ -24,19 +25,15 @@ class TaskRepository:
             created_at=task_dto.created_at,
         )
         self._session.add(task)
-        await self._session.commit()
-        await self._session.refresh(task)
-
         return task
 
     async def update(self, task: AITask, status: TaskStatus) -> None:
         """Обновляет статус задачи и сохраняет результат."""
         task = await self.get(task.id)
         task.status = status
-        task.completed_at = (
-            datetime.utcnow() if status != TaskStatus.PROCESSING else None
-        )
+        task.completed_at = datetime.utcnow() if status != TaskStatus.PROCESSING else None
         await self._session.commit()
+        logging.info(f"AITask - {task.id} - successfully updated.")
 
     async def get(self, task_id: str) -> AITask | None:
         """Получает задачу по ID."""

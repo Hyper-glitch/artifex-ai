@@ -1,4 +1,5 @@
 import logging
+from fastapi.responses import JSONResponse
 
 from fastapi import APIRouter, Depends, Security
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -9,8 +10,6 @@ from api.dto.task import AITaskRequest
 from api.services.task import TaskService
 
 router = APIRouter(prefix="/tasks")
-
-from fastapi.responses import JSONResponse
 
 
 @router.post("/create/")
@@ -23,7 +22,7 @@ async def create(
     try:
         await service.create(task_data=request, session=session)
     except Exception as exc:
-        logging.warning(f"Problem when creating AI task {request.id}")
+        logging.warning(f"Problem when creating AI task {request.task_id}")
         status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         content = {"success": False, "message": str(exc)}
     else:
