@@ -1,4 +1,5 @@
 import logging
+from pathlib import Path
 from typing import ClassVar, Literal
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -10,10 +11,14 @@ Venv.set_default_version("24.06")
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
+    model_config = SettingsConfigDict(
+        env_file=Path(__file__).parent.parent / ".env",
+        env_file_encoding="utf-8",
+    )
 
-    DEPLOYMENT_GROUP: ClassVar[str] = "content-generator"
+    DEPLOYMENT_GROUP: ClassVar[str] = "artifex-ai"
     DEPLOYMENT_VERSION: ClassVar[int] = 1
+    MODEL_INSTANCES: int = 1
 
     MLFLOW_TRACKING_URL: str = "http://localhost:8008"
     MLFLOW_TRACKING_USERNAME: str = ""
