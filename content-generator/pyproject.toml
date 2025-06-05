@@ -5,11 +5,6 @@ description = "Ensemble of models for content generation"
 readme = "README.md"
 authors = ["Roman Smirnov <smirnov.roman.olegovich@gmail.com>"]
 
-[[tool.poetry.source]]
-name = "internal"
-url = "https://nexus.samokat.io/repository/nexus-pypi-group/simple"
-priority = "explicit"
-
 [tool.poetry.dependencies]
 python = ">=3.10,<3.12"
 click = "^8.1.7"
