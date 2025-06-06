@@ -2,8 +2,9 @@ import asyncio
 from urllib.parse import urljoin
 
 from aiohttp import ClientSession
+import numpy as np
 
-from dto import TritonInput
+from dto import TritonInput, RMQMessage, Inputs
 from settings import settings
 
 
@@ -13,7 +14,7 @@ class AsyncTritonClient:
         self._session = ClientSession()
         self._semaphore = asyncio.Semaphore(settings.TRITON_MAX_CONCURRENCY)
 
-    async def infer(self, inputs: TritonInput) -> bytes:
+    async def infer(self, msg: RMQMessage) -> np.ndarray:
         """
         Отправляет запрос на Triton и возвращает результат.
 
@@ -29,12 +30,15 @@ class AsyncTritonClient:
           ]
         }
         """
+        inputs = [Inputs(data=[msg.prompt])]
+        data = TritonInput(inputs=inputs).model_dump()
         async with self._semaphore:
-            async with self._session.post(self._url, json=inputs) as response:
+            async with self._session.post(self._url, json=data) as response:
                 response.raise_for_status()
                 raw_data = await response.json()
 
-        return raw_data["outputs"][0]["data"]
+        int_list = raw_data["outputs"][0]["data"]
+        return np.array(int_list, dtype=np.uint8).reshape((settings.GEN_IMAGE_WIDTH, settings.GEN_IMAGE_HEIGHT, 3))
 
     async def close(self) -> None:
         await self._session.close()

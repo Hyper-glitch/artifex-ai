@@ -20,7 +20,11 @@ class Settings(BaseSettings):
     RABBITMQ_QUEUE_NAME: str = "gen-ai-tasks"
 
     TRITON_MAX_CONCURRENCY: int = 1
-    TRITON_MODEL_NAME: str = "sdxl-base"
+    TRITON_MODEL_NAME: str = "artifex-ai.main"
+    TRITON_CLIENT_URL: str = "http://localhost:8000"
+
+    GEN_IMAGE_WIDTH: int = 512
+    GEN_IMAGE_HEIGHT: int = 512
 
     @property
     def rmq_url(self) -> str:

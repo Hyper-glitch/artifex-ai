@@ -15,7 +15,7 @@ async def main() -> None:
     set_up_logger()
 
     api_cleint = AsyncApiClient(base_url=settings.BASE_API_URL, token=settings.API_AUTH_TOKEN)
-    triton_client = AsyncTritonClient(base_url="", model_name=settings.TRITON_MODEL_NAME)
+    triton_client = AsyncTritonClient(base_url=settings.TRITON_CLIENT_URL, model_name=settings.TRITON_MODEL_NAME)
     tg_bot = TgBotClient(token=settings.TG_BOT_TOKEN)
     svc = GenAIProcessingService(
         api_cleint=api_cleint,

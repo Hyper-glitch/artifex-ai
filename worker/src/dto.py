@@ -5,11 +5,15 @@ class TaskOutput(BaseModel):
     prediction: float
 
 
-class TritonInput(BaseModel):
+class Inputs(BaseModel):
     name: str = "prompt"
     shape: list[int] = [1]
     datatype: str = "BYTES"
     data: list[str]
+
+
+class TritonInput(BaseModel):
+    inputs: list[Inputs]
 
 
 class RMQMessage(BaseModel):

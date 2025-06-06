@@ -1,9 +1,11 @@
 import logging
 
+import numpy as np
+
 from clients.atrifex import AsyncApiClient
 from clients.tg_bot import TgBotClient
 from clients.triton import AsyncTritonClient
-from dto import RMQMessage, TritonInput
+from dto import RMQMessage
 from enums import TaskStatus
 
 
@@ -20,7 +22,7 @@ class GenAIProcessingService:
         await self._safe_update_status(msg.task_id, TaskStatus.PROCESSING)
 
         try:
-            image_data = await self._triton_client.mock_infer(inputs=TritonInput(data=[msg.prompt]))
+            image_np = await self._triton_client.infer(msg)
         except Exception as exc:
             await self._safe_update_status(
                 msg.task_id, TaskStatus.FAILED, detail=f"Inference failed: {exc}"
@@ -31,7 +33,7 @@ class GenAIProcessingService:
         await self._safe_update_status(
             msg.task_id, TaskStatus.COMPLETED, detail="Inference successful"
         )
-        await self._safe_send_photo(msg.chat_id, image_data, caption="Вот ваше изображение")
+        await self._safe_send_photo(msg.chat_id, image_np, caption="Вот ваше изображение")
         logging.info(f"GenAI task - {msg.task_id} - successfully processed.")
 
     async def _safe_update_status(
@@ -42,8 +44,8 @@ class GenAIProcessingService:
         except Exception as exc:
             logging.error(f"Failed to update status {status} for task {task_id}: {exc}")
 
-    async def _safe_send_photo(self, chat_id: int | str, image_data: bytes, caption: str) -> None:
+    async def _safe_send_photo(self, chat_id: int | str, image_np: np.ndarray, caption: str) -> None:
         try:
-            await self._tg_bot.send_photo(chat_id=chat_id, image_data=image_data, caption=caption)
+            await self._tg_bot.send_photo(chat_id=chat_id, image_np=image_np, caption=caption)
         except Exception as exc:
             logging.error(f"Failed to send photo to chat {chat_id}: {exc}")
