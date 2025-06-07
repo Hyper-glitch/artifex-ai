@@ -38,7 +38,9 @@ class AsyncTritonClient:
                 raw_data = await response.json()
 
         int_list = raw_data["outputs"][0]["data"]
-        return np.array(int_list, dtype=np.uint8).reshape((settings.GEN_IMAGE_WIDTH, settings.GEN_IMAGE_HEIGHT, 3))
+        return np.array(int_list, dtype=np.uint8).reshape(
+            (settings.GEN_IMAGE_WIDTH, settings.GEN_IMAGE_HEIGHT, 3)
+        )
 
     async def close(self) -> None:
         await self._session.close()
