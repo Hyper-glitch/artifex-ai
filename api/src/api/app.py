@@ -10,8 +10,8 @@ from api.rmq import AsyncRabbitMQProducer
 from api.services.task import TaskService
 from database import init_db
 from logger import logger
-from routers.user import router as user_router
-from routers.task import router as task_router
+from api.routers.user import router as user_router
+from api.routers.task import router as task_router
 from settings import settings
 from starlette.types import Lifespan
 
