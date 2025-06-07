@@ -19,7 +19,7 @@ class Preprocessor:
         "grey": "#919191",
         "light_grey": "#D9D9D9",
         "black": "#000000",
-        "white": "#FFFFFF"
+        "white": "#FFFFFF",
     }
     _lora_tag = "<ecomtechstyle>"
 
@@ -30,11 +30,11 @@ class Preprocessor:
     def _build_colored_prompt(cls, base_prompt: str):
         """Build prompt with corporate colors."""
         selected_colors = cls._get_random_colors()
-        color_description = ', '.join(
-            f"{name.replace('_', ' ')} ({hex_code})" for name, hex_code in selected_colors.items())
+        color_description = ", ".join(
+            f"{name.replace('_', ' ')} ({hex_code})" for name, hex_code in selected_colors.items()
+        )
         colored_prompt = (
-            f"{base_prompt}. Use only the following corporate colors: {color_description}. "
-            f"Maintain a cohesive and branded aesthetic"
+            f"{base_prompt}. Use only the following corporate colors: {color_description}."
         )
 
         return colored_prompt + f" in {cls._lora_tag}"
