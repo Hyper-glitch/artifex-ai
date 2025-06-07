@@ -44,5 +44,6 @@ class UpdateTaskResponse(BaseModel):
 
 class UpdateTaskRequest(BaseModel):
     task_id: str
-    status: TaskStatus
-    result: str | None
+    rating: int | None = Field(None, ge=0, le=5)
+    status: TaskStatus | None = None
+    logs: str | None = None
