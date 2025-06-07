@@ -37,6 +37,7 @@ pytest-asyncio = "0.23.8"
 pytest-cov = "^6.0.0"
 locust = "^2.18.0"
 httpx = "0.27.0"
+pytest-env = "^1.1.5"
 
 [tool.black]
 line-length = 100
@@ -122,3 +123,8 @@ build-backend = "poetry.core.masonry.api"
 [tool.pytest.ini_options]
 asyncio_mode = 'auto'
 pythonpath = ["src"]
+env = [
+  "AUTH_TOKEN=TEST",
+  "POSTGRES_USER=TEST",
+  "POSTGRES_PASSWORD=TEST"
+]
