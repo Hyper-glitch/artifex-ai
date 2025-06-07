@@ -5,7 +5,7 @@ from api.exceptions import UserNotFoundException
 from enums import SignUpStatus
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from api.dto.user import AuthUserRequest, SignUpUserRequest
+from api.dto.user import SignInUserRequest, SignUpUserRequest
 from api.repositories.user import UserRepository
 
 
@@ -24,7 +24,7 @@ class UserService:
         logging.info(f"User - {user_data.id} - successfully registered.")
         return SignUpStatus.CREATED
 
-    async def auth(self, user_data: AuthUserRequest, session: AsyncSession) -> None:
+    async def auth(self, user_data: SignInUserRequest, session: AsyncSession) -> None:
         """Проверяет пользователя в базе данных."""
         repo = self._repo_factory(session)
         user = await repo.get_user(id=user_data.id, username=user_data.username)
