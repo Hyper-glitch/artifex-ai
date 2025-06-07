@@ -51,7 +51,9 @@ async def lifespan(app: FastAPI) -> AsyncGenerator:
 
     producer = AsyncRabbitMQProducer()
     app.state.user_service = UserService(repo_factory=lambda session: UserRepository(session))
-    app.state.task_service = TaskService(repo_factory=lambda session: TaskRepository(session), producer=producer)
+    app.state.task_service = TaskService(
+        repo_factory=lambda session: TaskRepository(session), producer=producer
+    )
     yield
     logger.info("App shutdown.")
 
