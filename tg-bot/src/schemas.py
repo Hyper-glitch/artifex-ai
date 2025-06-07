@@ -24,13 +24,9 @@ class UserInfo(BaseUserInfo):
     language_code: str | None = Field(None, description="Код языка, например 'ru', 'en'")
 
 
-class FeedbackTaskRequest(BaseModel):
-    user_id: int = Field(..., description="Telegram user_id")
-    task_id: str = Field(..., description="Уникальный идентификатор задачи/запроса")
-    rating: int = Field(..., ge=1, le=5, description="Оценка качества от 1 до 5")
-    created_at: datetime = Field(
-        default_factory=datetime.utcnow, description="Время оставления отзыва"
-    )
+class UpdateTaskRequest(BaseModel):
+    task_id: str
+    rating: int | None = Field(default=None, ge=0, le=5)
 
 
 class CreateTaskRequest(BaseModel):
