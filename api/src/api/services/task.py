@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from api.exceptions import TaskNotFoundException
 from api.repositories.task import TaskRepository
 from api.rmq import AsyncRabbitMQProducer
+from models import AITask
 from settings import settings
 
 
@@ -20,7 +21,7 @@ class TaskService:
         self._repo_factory = repo_factory
         self._producer = producer
 
-    async def create(self, task_data: AITaskRequest, session: AsyncSession) -> None:
+    async def create(self, task_data: AITaskRequest, session: AsyncSession) -> AITask:
         """Создает и сохраняет новую AI задачу в БД и пушит в RMQ (транзакционно)."""
         try:
             async with session.begin():
@@ -39,6 +40,7 @@ class TaskService:
             raise
 
         logging.info(f"AITask - {task.id} - successfully created and published.")
+        return task
 
     async def update(self, task_data: UpdateTaskRequest, session: AsyncSession) -> None:
         """Получает и обновляет задачу по ID."""
