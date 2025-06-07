@@ -3,16 +3,16 @@ from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.dependepcies import get_session, get_user_service, verify_auth_token
-from api.dto.user import AuthUserRequest, SignUpUserRequest
+from api.dto.user import SignInUserRequest, SignUpUserRequest
 from api.exceptions import UserNotFoundException
 from api.services.user import UserService
 
 router = APIRouter(prefix="/users")
 
 
-@router.post("/authorize/")
-async def authorize(
-    request: AuthUserRequest,
+@router.post("/sign-in/")
+async def sign_in(
+    request: SignInUserRequest,
     session: AsyncSession = Depends(get_session),
     service: UserService = Depends(get_user_service),
     _: None = Security(verify_auth_token),
