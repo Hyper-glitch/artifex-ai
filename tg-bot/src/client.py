@@ -5,7 +5,7 @@ from aiohttp import ClientSession
 from schemas import (
     AuthUserRequest,
     CreateTaskRequest,
-    FeedbackTaskRequest,
+    UpdateTaskRequest,
     UserInfo,
 )
 from telebot.types import Message
@@ -38,13 +38,9 @@ class AsyncApiClient:
 
         logger.info(f"Task {dto.task_id} created successfully.")
 
-    async def create_feedback(self, user_id: int, rating: int) -> None:
-        dto = FeedbackTaskRequest(
-            user_id=user_id,
-            task_id=str(uuid.uuid4()),
-            rating=rating,
-        )
-        async with self._session.post("/feedback/create/", json=dto.model_dump()) as resp:
+    async def create_feedback(self, rating: int, task_id: str) -> None:
+        dto = UpdateTaskRequest(task_id=task_id, rating=rating)
+        async with self._session.post("tasks/update/", json=dto.model_dump()) as resp:
             resp.raise_for_status()
 
     @staticmethod
