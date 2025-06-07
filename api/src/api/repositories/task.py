@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime
 
-from api.dto.task import AITaskRequest
+from api.dto.task import AITaskRequest, UpdateTaskRequest
 from enums import TaskStatus
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -27,11 +27,19 @@ class TaskRepository:
         self._session.add(task)
         return task
 
-    async def update(self, task: AITask, status: TaskStatus) -> None:
+    async def update(self, task: AITask, task_data: UpdateTaskRequest) -> None:
         """Обновляет статус задачи и сохраняет результат."""
-        task = await self.get(task.id)
-        task.status = status
-        task.completed_at = datetime.utcnow() if status != TaskStatus.PROCESSING else None
+
+        updatable_fields = ("rating", "status", "logs")
+
+        for field in updatable_fields:
+            value = getattr(task_data, field)
+            if value is not None:
+                setattr(task, field, value)
+
+        if task_data.status == TaskStatus.COMPLETED:
+            task.completed_at = datetime.utcnow()
+
         await self._session.commit()
         logging.info(f"AITask - {task.id} - successfully updated.")
 
