@@ -1,21 +1,18 @@
-from buttons import create_rating_buttons
 from client import AsyncApiClient
 from decorator import requires_auth
 from dialogs import (
-    ACCEPTED_MESSAGE,
     ASK_NEW_PROMPT_MESSAGE,
     ERROR_MESSAGE,
     PROCESSING_MESSAGE,
-    RATE_PROMPT_MESSAGE,
     RATE_THANKS_MESSAGE,
-    REGENERATING_MESSAGE,
     STATUS_MESSAGES,
-    WELCOME_MESSAGE,
+    START_MESSAGE,
+    ERROR_TASK_MESSAGE,
+    AWAITING_PROMPT_MESSAGE,
 )
-from enums import CallbackData
 from loguru import logger
 from telebot.async_telebot import AsyncTeleBot
-from telebot.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup, Message
+from telebot.types import CallbackQuery, Message
 
 
 class Handlers:
@@ -27,36 +24,31 @@ class Handlers:
 
         self.bot.message_handler(commands=["start"])(self.start_handler)
         self.bot.message_handler(commands=["generate"])(self.handle_generate_command)
+        self.bot.message_handler(commands=["registrate"])(self.handle_registrate)
         self.bot.message_handler(content_types=["text"])(self.handle_prompt)
-        self.bot.callback_query_handler(func=lambda call: call.data != "registrate")(
+        self.bot.callback_query_handler(func=lambda call: call.data.startswith("rate_"))(
             self.callback_handler
-        )
-        self.bot.callback_query_handler(func=lambda call: call.data == "registrate")(
-            self.callback_registrate
         )
 
     async def start_handler(self, message: Message) -> None:
-        keyboard = InlineKeyboardMarkup()
-        btn = InlineKeyboardButton(text="Регистрация", callback_data="registrate")
-        keyboard.add(btn)
-        await self.bot.send_message(message.chat.id, WELCOME_MESSAGE, reply_markup=keyboard)
+        await self.bot.send_message(message.chat.id, START_MESSAGE)
 
-    async def callback_registrate(self, call: CallbackQuery) -> None:
+    async def handle_registrate(self, message: Message) -> None:
         try:
-            status = await self._client.sign_up_user(call.message)
+            status = await self._client.sign_up_user(message)
         except Exception as exc:
             logger.error(f"Problem when sign up user in API. {exc}")
-            await self.bot.send_message(call.message.chat.id, ERROR_MESSAGE)
+            await self.bot.send_message(message.chat.id, ERROR_MESSAGE)
             return
 
-        message = STATUS_MESSAGES.get(status, ERROR_MESSAGE)
-        await self.bot.send_message(call.message.chat.id, message)
+        await self.bot.send_message(
+            chat_id=message.chat.id,
+            text=STATUS_MESSAGES.get(status, ERROR_MESSAGE),
+        )
 
     @requires_auth
     async def handle_generate_command(self, message: Message):
-        await self.bot.send_message(
-            message.chat.id, "Please describe the image you want to generate (in English):"
-        )
+        await self.bot.send_message(message.chat.id, AWAITING_PROMPT_MESSAGE)
         self._user_states[message.chat.id] = "awaiting_prompt"
 
     @requires_auth
@@ -68,26 +60,22 @@ class Handlers:
                 await self._client.create_task(message)
             except Exception as exc:
                 logger.exception(f"Task creation failed. Error: {exc}")
-                await self.bot.send_message(message.chat.id, "❌ Error creating task.")
+                await self.bot.send_message(message.chat.id, ERROR_TASK_MESSAGE)
             else:
                 self._user_states.pop(message.chat.id, None)
                 await self.bot.send_message(message.chat.id, PROCESSING_MESSAGE)
 
     @requires_auth
     async def callback_handler(self, call: CallbackQuery) -> None:
-        if call.data == CallbackData.ACCEPT:
-            await self.bot.answer_callback_query(call.id, ACCEPTED_MESSAGE)
-            await self.bot.send_message(
-                call.message.chat.id, RATE_PROMPT_MESSAGE, reply_markup=create_rating_buttons()
-            )
+        _, payload = call.data.split("rate_")
+        rating_str, task_id = payload.split("|")
+        rating = int(rating_str)
 
-        elif call.data == CallbackData.REGENERATE:
-            await self.bot.answer_callback_query(call.id, REGENERATING_MESSAGE)
+        await self._client.create_feedback(
+            rating=rating,
+            task_id=task_id,
+        )
+        await self.bot.send_message(call.message.chat.id, RATE_THANKS_MESSAGE)
+        self._user_states[call.message.chat.id] = "awaiting_prompt"
 
-        elif call.data.startswith("rate_"):
-            await self._client.create_feedback(
-                user_id=call.from_user.id,
-                rating=int(call.data.split("_")[1]),
-            )
-            await self.bot.send_message(call.message.chat.id, RATE_THANKS_MESSAGE)
-            await self.bot.send_message(call.message.chat.id, ASK_NEW_PROMPT_MESSAGE)
+        await self.bot.send_message(call.message.chat.id, ASK_NEW_PROMPT_MESSAGE)
