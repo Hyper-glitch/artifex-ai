@@ -16,3 +16,5 @@ class AITask(Base):
     created_at = Column(DateTime)
     completed_at = Column(DateTime, nullable=True)
     user = relationship("User", back_populates="tasks")
+    rating = Column(Integer, nullable=True)
+    logs = Column(String, nullable=True)
