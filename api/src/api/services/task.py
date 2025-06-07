@@ -12,7 +12,11 @@ from settings import settings
 
 
 class TaskService:
-    def __init__(self, repo_factory: Callable[[AsyncSession], TaskRepository], producer: AsyncRabbitMQProducer) -> None:
+    def __init__(
+        self,
+        repo_factory: Callable[[AsyncSession], TaskRepository],
+        producer: AsyncRabbitMQProducer,
+    ) -> None:
         self._repo_factory = repo_factory
         self._producer = producer
 
@@ -36,12 +40,12 @@ class TaskService:
 
         logging.info(f"AITask - {task.id} - successfully created and published.")
 
-    async def update(self, request: UpdateTaskRequest, session: AsyncSession) -> None:
+    async def update(self, task_data: UpdateTaskRequest, session: AsyncSession) -> None:
         """Получает и обновляет задачу по ID."""
         repo = self._repo_factory(session)
-        task = await repo.get(request.task_id)
+        task = await repo.get(task_data.task_id)
         if not task:
             raise TaskNotFoundException()
 
-        await repo.update(task, request.status)
+        await repo.update(task, task_data)
         logging.info(f"AITask - {task.id} - status updated successfully.")
