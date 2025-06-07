@@ -4,7 +4,7 @@ from pydantic.v1 import Field
 from typing import Literal
 
 from enums import TaskStatus
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel
 
 
 class AITaskRequest(BaseModel):
@@ -18,28 +18,9 @@ class AITaskRequest(BaseModel):
     created_at: datetime = Field(..., description="Дата создания задачи")
 
 
-class MLTaskResponse(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-
-    id: str
-    user_id: int
-    model_name: str
-    input_data: str
-    status: TaskStatus
-    created_at: datetime
-    completed_at: datetime | None = None
-    cost: float
-    result: str | None = None
-
-
 class UpdateTaskStatusRequest(BaseModel):
     task_id: str
     status: TaskStatus
-
-
-class UpdateTaskResponse(BaseModel):
-    task_id: str
-    status: str = "success"
 
 
 class UpdateTaskRequest(BaseModel):
