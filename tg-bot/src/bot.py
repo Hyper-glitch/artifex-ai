@@ -1,6 +1,8 @@
 import asyncio
 import sys
 
+from aiohttp import ClientError
+
 from client import AsyncApiClient
 from handler import Handlers
 from loguru import logger
@@ -14,6 +16,19 @@ def prepare_logger() -> None:
     logger.info("Logger initialized")
 
 
+async def start_bot(bot: AsyncTeleBot) -> None:
+    while True:
+        try:
+            logger.info("Starting bot polling...")
+            await bot.infinity_polling(timeout=10, request_timeout=60)
+        except (ClientError, asyncio.TimeoutError, OSError) as e:
+            logger.error(f"Polling error: {e}. Retrying in 5 seconds...")
+            await asyncio.sleep(5)
+        except Exception:
+            logger.exception("Unexpected exception in polling loop")
+            await asyncio.sleep(5)
+
+
 async def main() -> None:
     prepare_logger()
 
@@ -23,7 +38,7 @@ async def main() -> None:
     Handlers(bot=bot, client=client)
 
     logger.info("Bot is starting to work...")
-    await bot.polling(non_stop=True)
+    await start_bot(bot)
     logger.info("Bot has finished work.")
 
 
