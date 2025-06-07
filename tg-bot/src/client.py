@@ -1,7 +1,6 @@
 import uuid
 from urllib.parse import urljoin
 
-import aiohttp
 from aiohttp import ClientSession
 from schemas import (
     AuthUserRequest,
@@ -31,6 +30,7 @@ class AsyncApiClient:
         dto = CreateTaskRequest(
             user_id=message.from_user.id,
             task_id=str(uuid.uuid4()),
+            chat_id=message.chat.id,
             prompt=message.text,
         )
         async with self._session.post("tasks/create/", json=dto.model_dump(mode="json")) as resp:
@@ -53,4 +53,4 @@ class AsyncApiClient:
             "Authorization": token,
             "Content-Type": "application/json",
         }
-        return aiohttp.ClientSession(headers=headers, base_url=urljoin(base_url, "/api/v1/"))
+        return ClientSession(headers=headers, base_url=urljoin(base_url, "/api/v1/"))

@@ -40,6 +40,7 @@ class CreateTaskRequest(BaseModel):
     status: Literal["new", "queued", "processing", "completed", "failed"] = Field(
         "new", description="Статус задачи"
     )
+    chat_id: int
     created_at: datetime = Field(
         default_factory=datetime.utcnow, description="Дата создания задачи"
     )

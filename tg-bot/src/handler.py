@@ -55,8 +55,7 @@ class Handlers:
     @requires_auth
     async def handle_generate_command(self, message: Message):
         await self.bot.send_message(
-            message.chat.id,
-            "Please describe the image you want to generate (in English):"
+            message.chat.id, "Please describe the image you want to generate (in English):"
         )
         self._user_states[message.chat.id] = "awaiting_prompt"
 
