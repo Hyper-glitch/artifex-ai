@@ -1,8 +1,6 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
-
-class TaskOutput(BaseModel):
-    prediction: float
+from enums import TaskStatus
 
 
 class Inputs(BaseModel):
@@ -20,3 +18,10 @@ class RMQMessage(BaseModel):
     task_id: str
     prompt: str
     chat_id: int
+
+
+class UpdateTaskRequest(BaseModel):
+    task_id: str
+    rating: int | None = Field(default=None, ge=0, le=5)
+    status: TaskStatus | None = None
+    logs: str | None = None
