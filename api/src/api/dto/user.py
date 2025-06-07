@@ -5,7 +5,7 @@ class UserBase(BaseModel):
     id: int
 
 
-class AuthUserRequest(BaseModel):
+class SignInUserRequest(BaseModel):
     id: int
     username: str
 
