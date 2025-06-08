@@ -1,4 +1,4 @@
-### Product Research
+### Product research
 
 - [analysis-comparison](analysis-comparison.md)
 - [business-analysis](business-analysis.md)
