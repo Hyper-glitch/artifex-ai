@@ -7,8 +7,6 @@ services:
       - tg-bot/.env
     environment:
       - PYTHONPATH=/opt/app/src
-    volumes:
-      - ./src:/src
     depends_on:
       - api
     restart: always
@@ -25,8 +23,6 @@ services:
       - PYTHONPATH=/opt/app/src
     ports:
       - "8080:8080"
-    volumes:
-      - ./src:/src
     depends_on:
       - database
       - rabbitmq
