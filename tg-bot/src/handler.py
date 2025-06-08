@@ -35,7 +35,7 @@ class Handlers:
 
     async def handle_registrate(self, message: Message) -> None:
         try:
-            status = await self._client.sign_up_user(message)
+            status = await self._client.sign_up(message)
         except Exception as exc:
             logger.error(f"Problem when sign up user in API. {exc}")
             await self.bot.send_message(message.chat.id, ERROR_MESSAGE)
