@@ -1,3 +1,5 @@
+from unittest.mock import AsyncMock
+
 import pytest
 
 
@@ -11,11 +13,14 @@ async def user_service(async_session):
 
 
 @pytest.fixture()
-async def task_service(async_session):
+async def mock_producer() -> AsyncMock:
+    return AsyncMock()
+
+
+@pytest.fixture()
+async def task_service(async_session, mock_producer: AsyncMock):
     """Создает MLTaskService с тестовой сессией."""
     from api.services.task import TaskService
     from api.repositories.task import TaskRepository
-    from api.rmq import AsyncRabbitMQProducer
 
-    producer = AsyncRabbitMQProducer()
-    yield TaskService(repo_factory=lambda session: TaskRepository(async_session), producer=producer)
+    yield TaskService(repo_factory=lambda session: TaskRepository(async_session), producer=mock_producer)
