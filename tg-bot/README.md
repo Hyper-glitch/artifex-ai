@@ -1,36 +1,20 @@
-# Artifex AI Chatbot Telegram Bot
+### Сервис: TG-Bot
+Telegram-бот обрабатывает команды пользователей, отправляет запросы в API для регистрации, авторизации, создания задач на генерацию. Интегрируется с RabbitMQ через API, а не напрямую.
 
-----
-- [Обзор](#overview)
-- [Локальный запуск](#local_run)
-- [Использование](#usage)
-----
-<h2 id="overview">Обзор</h2>
-Telegram бот
-TODO
+#### Основной функционал
+- `/start` — приветственное сообщение и кнопка регистрации
+- `/generate` — отправка промта для генерации изображения
+- Кнопка "Регистрация" — вызывает API для создания пользователя
+- Оценка сгенерированных изображений (рейтинг от 1 до 5)
 
+#### Переменные окружения
+Создайте `.env` файл в корневой папке `tg-bot`
 
-<h2 id="local_run">Локальный запуск</h2>
+⚠️ В контейнере указывайте `API_CLIENT_URL=http://api:8080`, а не `0.0.0.0:8080`, иначе бот не сможет достучаться до `API`.
+Локально для отладки используйте `API_CLIENT_URL=http://0.0.0.0:8080`.
 
-- Запустить с помощью Docker Compose - postgres и pgadmin
-```bash
-docker compose -f docker-compose.local.yaml up --build
+```env
+TELEGRAM_BOT_TOKEN=  # Токен при создании бота в @BotFather
+API_CLIENT_URL=
+API_CLIENT_AUTH_TOKEN=  # Самостоятельно сгенерированный  надежный токен для авторизации в API
 ```
-- Добавить src в PYTHONPATH
-```bash
-export PYTHONPATH="./src:$PYTHONPATH"
-```
-- Установить зависимости от poetry и создать виртуальное окружение
-```bash
-poetry install
-poetry shell
-```
-- Запустить бота с помощью poetry
-```bash
-poetry run python src/main.py
-```
-
-<h2 id="usage">Использование</h2>
-TODO
-
-<h2 id="usage">TODO</h2>
