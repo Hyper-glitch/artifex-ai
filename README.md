@@ -41,3 +41,7 @@
 ```bash
 docker-compose up --build -d
 ```
+
+### Использование
+- Tg-bot - @AIArtifexBot
+- [Смотреть видео](docs/demo.mov)
