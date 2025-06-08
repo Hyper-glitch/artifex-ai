@@ -16,12 +16,12 @@ class AsyncApiClient:
     def __init__(self, base_url: str, token: str) -> None:
         self._session = self._create_session(token, base_url)
 
-    async def auth_user(self, message: Message) -> None:
+    async def sign_in(self, message: Message) -> None:
         dto = AuthUserRequest.model_validate(message.from_user.to_dict())
-        async with self._session.post("users/authorize/", json=dto.model_dump()) as resp:
+        async with self._session.post("users/sign-in/", json=dto.model_dump()) as resp:
             resp.raise_for_status()
 
-    async def sign_up_user(self, message: Message) -> int:
+    async def sign_up(self, message: Message) -> int:
         dto = UserInfo.model_validate(message.json["chat"])
         async with self._session.post("users/sign-up/", json=dto.model_dump()) as resp:
             return resp.status
