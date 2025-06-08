@@ -9,10 +9,11 @@ from dialogs import (
     START_MESSAGE,
     ERROR_TASK_MESSAGE,
     AWAITING_PROMPT_MESSAGE,
+    START_TO_GENERATE_MESSAGE,
 )
 from loguru import logger
 from telebot.async_telebot import AsyncTeleBot
-from telebot.types import CallbackQuery, Message
+from telebot.types import CallbackQuery, Message, InlineKeyboardMarkup, InlineKeyboardButton
 
 
 class Handlers:
@@ -24,26 +25,33 @@ class Handlers:
 
         self.bot.message_handler(commands=["start"])(self.start_handler)
         self.bot.message_handler(commands=["generate"])(self.handle_generate_command)
-        self.bot.message_handler(commands=["registrate"])(self.handle_registrate)
+        self.bot.callback_query_handler(func=lambda call: call.data == "registrate")(self.registrate_call)
         self.bot.message_handler(content_types=["text"])(self.handle_prompt)
         self.bot.callback_query_handler(func=lambda call: call.data.startswith("rate_"))(
             self.callback_handler
         )
 
     async def start_handler(self, message: Message) -> None:
-        await self.bot.send_message(message.chat.id, START_MESSAGE)
+        keyboard = InlineKeyboardMarkup()
+        btn = InlineKeyboardButton(text="Регистрация", callback_data="registrate")
+        keyboard.add(btn)
+        await self.bot.send_message(message.chat.id, START_MESSAGE, reply_markup=keyboard)
 
-    async def handle_registrate(self, message: Message) -> None:
+    async def registrate_call(self, call: CallbackQuery) -> None:
         try:
-            status = await self._client.sign_up(message)
+            status = await self._client.sign_up(call.message)
         except Exception as exc:
             logger.error(f"Problem when sign up user in API. {exc}")
-            await self.bot.send_message(message.chat.id, ERROR_MESSAGE)
+            await self.bot.send_message(call.message.chat.id, ERROR_MESSAGE)
             return
 
         await self.bot.send_message(
-            chat_id=message.chat.id,
+            chat_id=call.message.chat.id,
             text=STATUS_MESSAGES.get(status, ERROR_MESSAGE),
+        )
+        await self.bot.send_message(
+            chat_id=call.message.chat.id,
+            text=START_TO_GENERATE_MESSAGE,
         )
 
     @requires_auth
