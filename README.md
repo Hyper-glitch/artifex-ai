@@ -44,4 +44,4 @@ docker-compose up --build -d
 
 ### Использование
 - Tg-bot - @AIArtifexBot
-- [Смотреть видео](docs/demo.mov)
+- [Смотреть видео](https://disk.yandex.ru/i/psWPYnWrA_ycfw)
