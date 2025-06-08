@@ -40,6 +40,6 @@ repos:
 
       - id: pytest
         name: pytest
-        entry: poetry run pytest --cov=src --cov-report=term-missing --cov-fail-under=70
+        entry: poetry run pytest --cov=src --cov-report=term-missing --cov-fail-under=76
         pass_filenames: false
         language: system
