@@ -25,13 +25,12 @@ class AsyncTritonClient:
               "name": "prompt",
               "shape": [1],
               "datatype": "BYTES",
-              "data": [...]
+              "data": ['prompt']
             }
           ]
         }
         """
-        inputs = [Inputs(data=[msg.prompt])]
-        data = TritonInput(inputs=inputs).model_dump()
+        data = TritonInput(inputs=[Inputs(data=[msg.prompt])]).model_dump()
         async with self._semaphore:
             async with self._session.post(self._url, json=data) as response:
                 response.raise_for_status()
