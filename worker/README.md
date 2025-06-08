@@ -14,11 +14,14 @@ rabbitmqctl set_permissions -p / myuser ".*" ".*" ".*"
 ```
 
 #### Переменные окружения
+Создайте `.env` файл в корневой папке `worker`
+
+`RABBITMQ_HOST=localhost` если локальная отладка, `RABBITMQ_HOST=rabbitmq` при запуске в контейнере.
 
 ```env
 RABBITMQ_DEFAULT_USER=myuser
 RABBITMQ_DEFAULT_PASS=mypassword
-RABBITMQ_HOST=localhost
+RABBITMQ_HOST=rabbitmq
 RABBITMQ_PORT=5672
 RABBITMQ_HEARTBEAT=30
 RABBITMQ_QUEUE_NAME="gen-ai-tasks"
