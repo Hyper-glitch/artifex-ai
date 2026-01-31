@@ -1,33 +1,36 @@
-## Artifex AI — ML-сервис для генерации брендовых изображений
-Мы в Artifex-AI помогаем дизайнерам и бренд-менеджерам быстро создавать визуалы, соответствующие бренд-буку. Мы используем ИИ, который улучшает текстовое описание и генерирует фирменные изображения. Это ускоряет работу, экономит ресурсы и обеспечивает визуальное единство.
-### Архитектура системы
+## Artifex AI — Service for Branded Image Generation
+
+At Artifex-AI, we help designers and brand managers quickly create visuals that comply with brand guidelines. We use AI to enhance text descriptions and generate branded images, accelerating workflows, saving resources, and ensuring visual consistency.
+
+### System Architecture
 ![arch.png](docs/arch.png)
 
-### Структура проекта
+### Project Structure
 
 ```
 .
 ├── README.md
-├── api/                  # FastAPI-сервис (регистрация, задачи)
-├── content-generator/    # Модуль генерации изображений (взаимодействует с Triton)
-├── worker/               # Асинхронный обработчик задач из очереди
-├── tg-bot/               # Telegram-бот для взаимодействия с пользователем
-├── research/             # Исследования и тесты моделей
-├── product-research/     # Бизнес-аналитика и исследования
+├── api/                  # FastAPI service (registration, task management)
+├── content-generator/    # Image generation module (interacts with Triton)
+├── worker/               # Asynchronous task processor from the queue
+├── tg-bot/               # Telegram bot for user interaction
+├── research/             # Model research and testing
+├── product-research/     # Business analytics and research
+
 ```
 
-### Возможности
-- Регистрация пользователей и создание задач через `Telegram`
-- Асинхронная очередь задач `RabbitMQ`
-- Инференс изображений через `Triton Inference Server`
-- Масштабируемая архитектура для продакшн-нагрузки
+### Features
+- User registration and task creation via `Telegram`
+- Asynchronous task queue using `RabbitMQ`
+- Image inference via `Triton Inference Server`
+- Scalable architecture for production workloads
 
-❗ Важное ограничение `MVP`. На данном этапе сохранение сгенерированных изображений в `S3` не реализовано. Изображения доступны только во время сессии `Telegram` и не сохраняются на внешнем хранилище.
-Это ограничение будет снято в следующей итерации разработки.
+❗ Important MVP limitation: At this stage, saving generated images to S3 is not implemented. Images are only available during the Telegram session and are not stored externally.
+This limitation will be addressed in the next development iteration.
 
+### Documentation
+Detailed documentation including environment variables for each service:
 
-### Документация
-Детальная документация с переменными окружения для каждого сервиса.
 - [Product research](product-research/README.md)
 - [AI models research](research/README.md)
 - [TG-Bot](tg-bot/README.md)
@@ -35,13 +38,13 @@
 - [Worker](worker/README.md)
 - [Triton inference Models](content-generator/README.md)
 
-### Запуск с Docker Compose
-❗ Важно: Для работы требуется активное VPN-соединение с закрытым контуром, где развернут `Triton Inference Server`.
+### Running with Docker Compose
+❗Note: An active VPN connection to the private network hosting the Triton Inference Server is required.
 
 ```bash
 docker-compose up --build -d
 ```
 
-### Использование
-- Tg-bot - @AIArtifexBot
-- [Смотреть видео](https://disk.yandex.ru/i/psWPYnWrA_ycfw)
+### Usage
+- Telegram bot: @AIArtifexBot
+- [Watch demo video](https://disk.yandex.ru/i/psWPYnWrA_ycfw)
